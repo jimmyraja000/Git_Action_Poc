@@ -10,7 +10,7 @@ env:
   
   AZURE_DEVWEBAPP_NAME: GitAc-Dev
   AZURE_PREPRODWEBAPP_NAME: GitAc-PreProd
-  AZURE_WEBAPP_PACKAGE_PATH: 'D:\a\Git_Action_Poc\Git_Action_Poc\Git_Action_Poc\bin'
+  AZURE_WEBAPP_PACKAGE_PATH: 'D:\a\Git_Action_Poc\Git_Action_Poc\Git_Action_Poc\'
 jobs:
   Build:
     runs-on: windows-latest
@@ -54,7 +54,7 @@ jobs:
            
     - name: running6
       run: |
-           dir D:\a\Git_Action_Poc\Git_Action_Poc\Git_Action_Poc\bin
+           dir D:\a\Git_Action_Poc\Git_Action_Poc\Git_Action_Poc\
          
   #  - name: Extract artifacts
    #   uses: actions/extract-archive@v2
