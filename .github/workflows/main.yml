@@ -168,19 +168,19 @@ jobs:
         
 #               cd C:\inetpub\wwwroot\
  
-#               Copy-Item C:\actions-runner5\_work\Git_Final_Test\Git_Final_Test\Git_Final_Test\* C:\inetpub\wwwroot\${{env.DEV_WEBSITE_NAME}} -Recurse -Force
+#               Copy-Item C:\actions-runner2\_work\Git_Final_Test\Git_Final_Test\Git_Final_Test\* C:\inetpub\wwwroot\${{env.DEV_WEBSITE_NAME}} -Recurse -Force
 
           - name: create new apppool
             run: |
                  Set-ExecutionPolicy RemoteSigned
-                 Start-Process powershell.exe -Verb RunAs -ArgumentList "-File C:\actions-runner\_work\Git_Action_Poc\Git_Action_Poc\Git_Action_Poc\Scripts\DevTestAppPool.ps1"
+                 Start-Process powershell.exe -Verb RunAs -ArgumentList "-File C:\actions-runner2\_work\Git_Action_Poc\Git_Action_Poc\Git_Action_Poc\Scripts\DevTestAppPool.ps1"
                  
                  # & C:\actions-runner\_work\GitNewTest2\GitNewTest2\GitNewTest2\Scripts\DevTestAppPool.ps1
           - name: create website
             run: |
                # Set-ExecutionPolicy RemoteSigned
                #Import-Module WebAdministration
-               C:\actions-runner\_work\Git_Action_Poc\Git_Action_Poc\Git_Action_Poc\Scripts\DevTestWebsite.ps1
+               C:\actions-runner2\_work\Git_Action_Poc\Git_Action_Poc\Git_Action_Poc\Scripts\DevTestWebsite.ps1
           - name: config to use new appool
             run: |
               Set-ExecutionPolicy RemoteSigned
