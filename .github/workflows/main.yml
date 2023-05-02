@@ -2,7 +2,7 @@ name: DEEEEDeploy to Development Environment
 on:
   push:
     branches:
-       - master
+       - main
   pull_request:
     branches:
        - PrepRod
