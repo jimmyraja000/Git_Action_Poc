@@ -1,0 +1,198 @@
+name: DEEEEDeploy to Development Environment
+on:
+  push:
+    branches:
+       - master
+  pull_request:
+    branches:
+       - PrepRod
+env:
+  
+  AZURE_DEVWEBAPP_NAME: GitAc-Dev
+  AZURE_PREPRODWEBAPP_NAME: GitAc-PreProd
+  AZURE_WEBAPP_PACKAGE_PATH: 'D:\a\Git_Action_Poc\Git_Action_Poc\Git_Action_Poc\bin'
+jobs:
+  Build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v1.0.5
+
+    - name: Restore NuGet packages
+      run:  nuget restore Git_Action_Poc/Git_Action_Poc.sln
+
+    - name: build
+      run: |
+           msbuild Git_Action_Poc/Git_Action_Poc.sln /t:Build /p:Configuration=Release /p:Platform="Any CPU" /verbosity:minimal
+    - name: publish
+      run: |
+           msbuild Git_Action_Poc/Git_Action_Poc.sln /t:Publish /p:Configuration=Release /p:Platform="Any CPU" /p:PublishDir="./artifacts"
+   
+      
+      #--output ${{env.AZURE_WEBAPP_PACKAGE_PATH}}
+      
+#    - name: Upload artifacts
+ #     uses: actions/upload-artifact@v2
+  #    with:
+   #     name: MyProject artifacts
+    #    path: bin/Release
+      
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+            name: myapp
+            path: ${{env.AZURE_WEBAPP_PACKAGE_PATH}}
+            
+    - name: running1
+      run: |
+           Get-location
+           
+    - name: running6
+      run: |
+           dir D:\a\Git_Action_Poc\Git_Action_Poc\Git_Action_Poc\bin
+         
+  #  - name: Extract artifacts
+   #   uses: actions/extract-archive@v2
+    #  with:
+     #  archive-file: ${{github.workspace}}
+      # output-directory: ${{github.workspace}}
+    #- name: run     
+     # run: |
+      #     dir ./artifacts
+       #    dir
+        #   cd Git_Action_Poc
+
+         #  dir
+          # cd bin
+           #dir
+#   DeployDev:
+#       name: Dev
+#       needs: Build
+# #       if: github.event_name == 'refs/heads/master'
+#       runs-on: windows-latest
+# #       env:
+# #         DEPLOYMENT_ENVIRONMENT: Dev
+# #         AZURE_DEVWEBAPP_NAME: GitAc-Dev
+# #         AZURE_PREPRODWEBAPP_NAME: GitAc-PreProd
+# #         AZURE_WEBAPP_PACKAGE_PATH: 'D:\a\Git_Action_Poc\Git_Action_Poc\bin\'
+#       environment:
+#           name: Dev
+    - name: Download artifacts
+      uses: actions/download-artifact@v2
+      with:
+        name: myapp
+        path: 'C:\app.publish'
+    - name: running
+      run: |
+           Get-location
+           
+    - name: running2
+      run: |
+           dir
+           
+    - name: running3
+      run: |
+           cd C:\app.publish
+           dir
+ 
+          
+  DeployDev:
+       
+     
+      
+       name: Dev
+       needs: Build
+        # if: github.event_name == 'refs/heads/master'
+       runs-on: self-hosted
+       env:
+          DEV_WEBSITE_NAME: ${{secrets.DEV_WEBSITE_NAME}}
+          DEV_APP_POOL_NAME: ${{secrets.DEV_APP_POOL_NAME}}
+#           WEBAPP_MSDeploy_USERNAME: ${{secrets.IIS_USERNAME}}
+#           WEBAPP_MSDeploy_PASSWORD: ${{secrets.IIS_PASSWORD}}
+       environment:
+            name: Dev
+       steps:
+          - name: Checkout Code 
+            uses: actions/checkout@v2
+          - name: Download artifacts
+            uses: actions/download-artifact@v2
+            with:
+             name: myapp
+             path: 'C:\app.publish'
+           
+            
+          - name: copying
+            run: |
+                 $path="${{github.workspace}}\Git_Action_Poc\Scripts\DevTestScript.ps1"
+                 echo $path
+                 & $path
+        
+                 cd C:\inetpub\wwwroot\
+                 dir
+                 Copy-Item C:\app.publish\* C:\inetpub\wwwroot\${{env.DEV_WEBSITE_NAME}} -Recurse -Force
+
+
+#        - name: Deploy
+#          uses: Azure/webapps-deploy@v2
+#          with:
+#             app-name: ${{env.AZURE_DEVWEBAPP_NAME}}
+#             publish-profile: ${{secrets.AZURE_DEVPUBLISH_PROFILE}}
+#             package: artifacts/
+#   DeployDev:
+#       name: Dev
+#       needs: Build
+# #       if: github.event_name == 'refs/heads/master'
+#       runs-on: self-hosted
+#       env:
+#         DEV_WEBSITE_NAME: ${{secrets.DEV_WEBSITE_NAME}}
+#         DEV_APP_POOL_NAME: ${{secrets.DEV_APP_POOL_NAME}}
+# #         WEBAPP_MSDeploy_USERNAME: ${{secrets.IIS_USERNAME}}
+# #         WEBAPP_MSDeploy_PASSWORD: ${{secrets.IIS_PASSWORD}}
+#       environment:
+#           name: Dev
+#       steps:
+#       # - name: Download artifacts
+#        #  uses: actions/download-artifact@v2
+#         # with:
+#          # name: myapp
+#           #path: artifacts/
+#        - name: copying
+#          run: |
+#               Set-ExecutionPolicy RemoteSigned
+#               & C:\actions-runner5\_work\Git_Final_Test\Git_Final_Test\Git_Final_Test\Psscripts\DevTestScript.ps1
+        
+#               cd C:\inetpub\wwwroot\
+ 
+#               Copy-Item C:\actions-runner5\_work\Git_Final_Test\Git_Final_Test\Git_Final_Test\* C:\inetpub\wwwroot\${{env.DEV_WEBSITE_NAME}} -Recurse -Force
+
+          - name: create new apppool
+            run: |
+                 Set-ExecutionPolicy RemoteSigned
+                 Start-Process powershell.exe -Verb RunAs -ArgumentList "-File C:\actions-runner\_work\Git_Action_Poc\Git_Action_Poc\Git_Action_Poc\Scripts\DevTestAppPool.ps1"
+                 
+                 # & C:\actions-runner\_work\GitNewTest2\GitNewTest2\GitNewTest2\Scripts\DevTestAppPool.ps1
+          - name: create website
+            run: |
+               # Set-ExecutionPolicy RemoteSigned
+               #Import-Module WebAdministration
+               C:\actions-runner\_work\Git_Action_Poc\Git_Action_Poc\Git_Action_Poc\Scripts\DevTestWebsite.ps1
+          - name: config to use new appool
+            run: |
+              Set-ExecutionPolicy RemoteSigned
+              Import-Module WebAdministration
+              Set-ItemProperty -Path "IIS:\Sites\${{env.DEV_WEBSITE_NAME}}" -Name "applicationPool" -Value ${{env.DEV_APP_POOL_NAME}}
+
+         
+       
+          - name: Deploy to IIS
+            run: |
+               #Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+               Set-ExecutionPolicy RemoteSigned
+               iisreset /stop
+               iisreset /start
+
