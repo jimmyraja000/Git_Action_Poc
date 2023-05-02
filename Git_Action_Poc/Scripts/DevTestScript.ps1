@@ -1,4 +1,4 @@
-﻿$DEV_WEBSITE_NAME="DevGit_New_Test2"
+﻿$DEV_WEBSITE_NAME="dev_web_Git"
 $dir = "C:\inetpub\wwwroot\$DEV_WEBSITE_NAME"
 if(!(Test-Path -Path $dir )){
     New-Item -ItemType directory -Path $dir
